@@ -1,0 +1,20 @@
+Cosas a mejorar:
+
+** IMPORTANTES
+ - Preprocesado de texto unificado!
+ - Configuración desde JSON
+
+** General:
+ - Hyperparameter tunning
+ - Validación cruzada
+ - Visualización Tensorboard???
+
+
+* sa_model.py
+    .run_epoch() -> Revisar barra de progreso!
+
+* ner_model.py
+    Revisar si predicción por batches
+
+* config
+    .get_vocabulary_char() -> si no existe, crearlo con el corpus de entrenamiento y validacion

@@ -1,0 +1,126 @@
+/* 
+*   Jenkinsfile
+*
+*   plugins de jenkisn: git, gitlab, gitlab notifications
+*   más información sobre el plugin de gitlab https://github.com/jenkinsci/gitlab-plugin
+*/
+
+
+
+def buildAndPushImages(imagename, version, path){
+    customImage = docker.build("argon-docker.itainnova.es/${imagename}:${version}", "${path}")
+    
+}
+
+    
+node {
+    def gitRepository = 'https://git.itainnova.es/bigdata/misc/entity_detector.git'
+    
+  
+    def scannerHome = tool 'SonarQubeScanner'
+   
+    env.PATH = "${scannerHome}/bin:${env.PATH}"
+
+    def workspace = env.WORKSPACE
+
+    stage ('Execution environment info') {
+        sh "whoami"
+
+    }
+
+    def sourceBranch=env.gitlabSourceBranch
+    echo sourceBranch
+    if(sourceBranch == null) {
+        sourceBranch="dev"
+        echo "source branch is null. Def.value=$sourceBranch"
+    }
+    def version = "latest"
+    
+  
+    echo "source branch  is = $sourceBranch"
+    echo "images version is = $version"
+ 
+
+    stage ('checkout') {
+        checkout([$class: 'GitSCM', branches: [[name: "origin/$sourceBranch"]], userRemoteConfigs: [[url: "${gitRepository}", credentialsId: 'b2613b3e-5a96-44b1-a914-32b698b75b22']]])
+    }
+    stage('Sonarqube') {
+        withSonarQubeEnv('sonarqube') {
+            try {  
+                sh "${scannerHome}/bin/sonar-scanner"
+            } catch(Exception e) {
+                echo "sonarQube down"
+            }
+        }
+    }
+}
+
+node('hamilton') {
+    
+    def gitRepository = 'https://git.itainnova.es/bigdata/misc/entity_detector.git'
+    
+    def sourceBranch=env.gitlabSourceBranch
+    echo sourceBranch
+    if(sourceBranch == "dev"){
+        version = 'latest'
+    }
+    if(sourceBranch == "master"){
+        version = 'latest'
+    }
+    echo "source branch  is = $sourceBranch"
+    echo "images version is = $version"
+ 
+
+    stage ('checkout') {
+        checkout([$class: 'GitSCM', branches: [[name: "origin/$sourceBranch"]], userRemoteConfigs: [[url: "${gitRepository}", credentialsId: 'b2613b3e-5a96-44b1-a914-32b698b75b22']]])
+
+        //dir('src/test/python') {
+            //stash 'user_interface.py'
+        //}
+    }
+
+
+	gitlabBuilds(builds: ["build image","test","publish"]) {
+		def customImage
+            stage ('build image') {
+                gitlabCommitStatus("build image") {
+                   
+				   customImage = docker.build("argon-docker.itainnova.es/argon-ner-test:latest", ".")
+					   
+                }
+            }
+
+            stage ('test') {
+                gitlabCommitStatus("test") {
+					def container = customImage.run("-p 6002:4999 --name argon-ner-test --rm ")
+					sleep( 30 ) 
+                    sh "bash ./test.sh"
+                    container.stop()
+                    
+                    
+				   
+                }
+            }
+			/*
+            stage ('publish') {
+                gitlabCommitStatus("publish") {
+                   
+				   customImage.push()
+                }
+            }
+			*/
+			
+   
+        }
+	
+    stage ('cleanup') {
+		try{
+			sh 'sudo docker stop argon-ner-test' 
+		} catch(Exception e) {
+		
+		}
+		
+        //sh "sudo docker system prune -a -f"
+        
+    }		
+}    

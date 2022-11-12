@@ -1,0 +1,37 @@
+{
+    "dir_output":"results/ner/",
+	"model_name":"model_glove_all_char100_300_3.weights/",
+
+    "dim_word":300,
+    "dim_char":100,
+
+    "type_pretrained": "text",
+    "filename_glove":"resources/glove_all/vectors300.txt",
+
+    "use_chars":true,
+    "filename_chars":"resources/ner/conll2002/chars.txt",
+
+    "dir_dataset":"resources/ner/conll2002/",
+    "filename_train":"esp.train.txt",
+    "filename_dev":"esp.testa.txt",
+    "filename_test":"esp.testa.txt",
+    "delimiter":",",
+    
+    "filename_tags":"tags.txt",
+    "ntags":9,
+
+    "train_embeddings":false,
+    "nepochs"         :30,
+    "dropout"         :0.5,
+    "batch_size"      :32,
+    "opt_method"      :"adam",
+    "lr"              :0.005,
+    "lr_decay"        :0.9,
+    "nepoch_no_imprv" :20,
+
+    "layers":1,
+    "hidden_size_char":100,
+    "hidden_size_lstm":300,
+
+    "use_crf":true
+}

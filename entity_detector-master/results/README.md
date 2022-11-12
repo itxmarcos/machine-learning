@@ -1,0 +1,1 @@
+Carpeta donde se guarda el modelo generado en el entrenemiento segun el archivo config_default.json

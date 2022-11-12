@@ -1,0 +1,9 @@
+tensorflow==1.13.1
+numpy
+#logging
+sklearn
+pandas_ml
+gevent==1.4.0
+flask
+duckling
+gensim

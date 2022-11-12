@@ -1,0 +1,8 @@
+# dont copy this files below 
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+Jenkinsfile
+sonar-project.properties
+startDocker.sh
