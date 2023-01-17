@@ -2,7 +2,11 @@
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s::: %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logging.basicConfig(
+  level=logging.DEBUG, 
+  format='%(asctime)s - %(levelname)s::: %(message)s', 
+  datefmt='%d-%b-%y %H:%M:%S'
+)
 str = 'wawawiwa'
 logging.debug(f'My string is {str}')
 
